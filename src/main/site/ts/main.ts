@@ -43,7 +43,7 @@ function postAndUpdate(): void {
   //  HINT: check out the POST REQUESTS section of the lab and of the front-end guide.
   //  Make sure you add "Access-Control-Allow-Origin":"*" to your headers.
   //  Remember to add a type annotation for the response data using the Matches type you defined above!
-  fetch('http://localhost:63342/matches', {
+  fetch('http://localhost:4567/matches', {
     method: 'POST',
     body: JSON.stringify(postParameters),
     headers: {

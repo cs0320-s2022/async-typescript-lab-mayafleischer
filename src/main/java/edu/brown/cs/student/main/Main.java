@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import com.google.common.collect.ImmutableMap;
@@ -14,6 +16,8 @@ import freemarker.template.Configuration;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
+import org.json.JSONException;
+import org.json.JSONObject;
 import spark.*;
 import spark.template.freemarker.FreeMarkerEngine;
 
@@ -77,6 +81,10 @@ public final class Main {
       return "OK";
     });
 
+    Spark.post("/results", new ResultsHandler());
+
+
+
     // Allows requests from any domain (i.e., any URL). This makes development
     // easier, but it’s not a good idea for deployment.
     Spark.before((request, response) -> response.header("Access-Control-Allow-Origin", "*"));
@@ -106,18 +114,23 @@ public final class Main {
    */
   private static class ResultsHandler implements Route {
     @Override
-    public String handle(Request req, Response res) {
+    public String handle(Request req, Response res) throws JSONException {
+      JSONObject obj = new JSONObject(req.body());
+      String sun = obj.getString("sun");
+      String moon = obj.getString("moon");
+      String rising = obj.getString("rising");
       // TODO: Get JSONObject from req and use it to get the value of the sun, moon,
       // and rising
       // for generating matches
-
+      List<String> matches = MatchMaker.makeMatches(sun,moon,rising);
       // TODO: use the MatchMaker.makeMatches method to get matches
-
       // TODO: create an immutable map using the matches
+      ImmutableMap<String, String> map = ImmutableMap.of("sun", matches.get(0), "moon",
+          matches.get(1), "rising", matches.get(2));
 
       // TODO: return a json of the suggestions (HINT: use GSON.toJson())
       Gson GSON = new Gson();
-      return null;
+      return GSON.toJson(map);
     }
   }
 }

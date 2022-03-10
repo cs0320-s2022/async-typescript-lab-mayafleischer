@@ -1,21 +1,27 @@
 // TODO: select the list element where the suggestions should go, and all three dropdown elements
 //  HINT: look at the HTML
-const suggestionsList = document.querySelector('#suggestions') as HTMLElement
+let suggestionsList = document.querySelector('#suggestions') as HTMLInputElement
 
 // Here, when the value of sun is changed, we will call the method postAndUpdate.
 // TODO: Do the same for moon and rising
-const sunClick = document.getElementById('#sun') as HTMLFormElement
-sunClick.addEventListener("change", () => postAndUpdate())
-const moonClick = document.querySelector('#moon') as HTMLFormElement
-moonClick.addEventListener("change", () => postAndUpdate())
-const risingClick = document.querySelector('#rising') as HTMLFormElement
-risingClick.addEventListener("change", () => postAndUpdate())
+const sunClick = document.querySelector('#sun') as HTMLInputElement
+sunClick.addEventListener("change", postAndUpdate)
+const moonClick = document.querySelector('#moon') as HTMLInputElement
+moonClick.addEventListener("change", postAndUpdate)
+const risingClick = document.querySelector('#rising') as HTMLInputElement
+risingClick.addEventListener("change", postAndUpdate)
 
 // TODO: Define a type for the request data object here.
-type MatchesRequestData = {"sun": string, "moon": string, "rising": string}
+type MatchesRequestData = {
+  sun: string;
+  moon: string;
+  rising: string;
+}
 
 // TODO: Define a type for the response data object here.
-type Matches = {"sun": string, "moon": string, "rising": string}
+type Matches = {
+  matches: string[]
+}
 
 function postAndUpdate(): void {
   // TODO: empty the suggestionList (you want new suggestions each time someone types something new)
@@ -37,21 +43,17 @@ function postAndUpdate(): void {
   //  HINT: check out the POST REQUESTS section of the lab and of the front-end guide.
   //  Make sure you add "Access-Control-Allow-Origin":"*" to your headers.
   //  Remember to add a type annotation for the response data using the Matches type you defined above!
-  fetch('/results', {
-    method: 'post',
-    body: JSON.stringify({
-      object: postParameters
-    }),
+  fetch('http://localhost:63342/matches', {
+    method: 'POST',
+    body: JSON.stringify(postParameters),
     headers: {
       "Access-Control-Allow-Origin":"*"
     },
   })
       .then((response) => response.json())
-      .then(data => {
-            console.log("Success :" + data)
+      .then((data : Matches) => {
             updateSuggestions(data.matches)
       })
-      .catch(error => console.log("ERROR: "+error))
 
   // TODO: Call and fill in the updateSuggestions method in one of the .then statements in the Promise
   //  Parse the JSON in the response object
@@ -59,8 +61,8 @@ function postAndUpdate(): void {
 }
 
 function updateSuggestions(matches: string[]): void {
-  for (const match of matches) {
-    suggestionsList.innerHTML += `<li tabindex="0">match</li>`
+  for (let match of matches) {
+    suggestionsList.innerHTML += `<li tabindex="0">`+match+`</li>`
   }
   // TODO: for each element in the set of matches, append it to the suggestionList
   //  HINT: use innerHTML += to append to the suggestions list
@@ -69,9 +71,11 @@ function updateSuggestions(matches: string[]): void {
   //  This makes each element selectable via screen reader.
 }
 
-document.addEventListener("keyup" () => {
-  updateValues("Leo", "Leo", "Libra")
-      .then(postAndUpdate())
+document.addEventListener("keyup", async input => {
+  if (input.key == "Enter") {
+    await updateValues("Leo", "Leo", "Libra")
+    postAndUpdate()
+  }
 })
 // TODO: create an event listener to the document (document.addEventListener) that detects "keyup".
 //  When a certain key of your choice is clicked, reset the values of sun, moon, and rising to your own
@@ -83,7 +87,7 @@ async function updateValues(sunval: string, moonval: string, risingval: string):
   // This line asynchronously waits 1 second before updating the values.
   // It's unnecessary here, but it simulates asynchronous behavior you often have to account for.
   await new Promise(resolve => setTimeout(resolve, 1000));
-  sun.value = sunval;
-  moon.value = moonval;
-  rising.value = risingval;
+  sunClick.value = sunval;
+  moonClick.value = moonval;
+  risingClick.value = risingval;
 }

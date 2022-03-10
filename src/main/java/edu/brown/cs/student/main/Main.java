@@ -1,25 +1,16 @@
 package edu.brown.cs.student.main;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
+
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
-import freemarker.template.Configuration;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
-import joptsimple.OptionSpec;
 import org.json.JSONException;
 import org.json.JSONObject;
 import spark.*;
-import spark.template.freemarker.FreeMarkerEngine;
 
 /**
  * The Main class of our project. This is where execution begins.
@@ -81,9 +72,7 @@ public final class Main {
       return "OK";
     });
 
-    Spark.post("/results", new ResultsHandler());
-
-
+    Spark.post("/matches", new ResultsHandler());
 
     // Allows requests from any domain (i.e., any URL). This makes development
     // easier, but it’s not a good idea for deployment.
@@ -125,8 +114,7 @@ public final class Main {
       List<String> matches = MatchMaker.makeMatches(sun,moon,rising);
       // TODO: use the MatchMaker.makeMatches method to get matches
       // TODO: create an immutable map using the matches
-      ImmutableMap<String, String> map = ImmutableMap.of("sun", matches.get(0), "moon",
-          matches.get(1), "rising", matches.get(2));
+      ImmutableMap<String, List<String>> map = ImmutableMap.of("matches", matches);
 
       // TODO: return a json of the suggestions (HINT: use GSON.toJson())
       Gson GSON = new Gson();

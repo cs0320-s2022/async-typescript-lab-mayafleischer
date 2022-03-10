@@ -10,15 +10,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 // TODO: select the list element where the suggestions should go, and all three dropdown elements
 //  HINT: look at the HTML
-const suggestionsList = document.querySelector('#suggestions');
+let suggestionsList = document.querySelector('#suggestions');
 // Here, when the value of sun is changed, we will call the method postAndUpdate.
 // TODO: Do the same for moon and rising
-const sunClick = document.getElementById('#sun');
-sunClick.addEventListener("change", () => postAndUpdate());
+const sunClick = document.querySelector('#sun');
+sunClick.addEventListener("change", postAndUpdate);
 const moonClick = document.querySelector('#moon');
-moonClick.addEventListener("change", () => postAndUpdate());
+moonClick.addEventListener("change", postAndUpdate);
 const risingClick = document.querySelector('#rising');
-risingClick.addEventListener("change", () => postAndUpdate());
+risingClick.addEventListener("change", postAndUpdate);
 function postAndUpdate() {
     // TODO: empty the suggestionList (you want new suggestions each time someone types something new)
     //  HINT: use .innerHTML
@@ -36,28 +36,24 @@ function postAndUpdate() {
     //  HINT: check out the POST REQUESTS section of the lab and of the front-end guide.
     //  Make sure you add "Access-Control-Allow-Origin":"*" to your headers.
     //  Remember to add a type annotation for the response data using the Matches type you defined above!
-    fetch('/results', {
-        method: 'post',
-        body: JSON.stringify({
-            object: postParameters
-        }),
+    fetch('http://localhost:63342/matches', {
+        method: 'POST',
+        body: JSON.stringify(postParameters),
         headers: {
             "Access-Control-Allow-Origin": "*"
         },
     })
         .then((response) => response.json())
-        .then(data => {
-        console.log("Success :" + data);
+        .then((data) => {
         updateSuggestions(data.matches);
-    })
-        .catch(error => console.log("ERROR: " + error));
+    });
     // TODO: Call and fill in the updateSuggestions method in one of the .then statements in the Promise
     //  Parse the JSON in the response object
     //  HINT: remember to get the specific field in the JSON you want to use
 }
 function updateSuggestions(matches) {
-    for (const match of matches) {
-        suggestionsList.innerHTML += `<li tabindex="0">match</li>`;
+    for (let match of matches) {
+        suggestionsList.innerHTML += `<li tabindex="0">` + match + `</li>`;
     }
     // TODO: for each element in the set of matches, append it to the suggestionList
     //  HINT: use innerHTML += to append to the suggestions list
@@ -65,10 +61,12 @@ function updateSuggestions(matches) {
     //  make sure to add the attribute 'tabindex="0"' (for example: <li tabindex="0">{your element}</li>).
     //  This makes each element selectable via screen reader.
 }
-document.addEventListener("keyup"(), {
-    : 
-        .then(postAndUpdate())
-});
+document.addEventListener("keyup", (input) => __awaiter(void 0, void 0, void 0, function* () {
+    if (input.key == "Enter") {
+        yield updateValues("Leo", "Leo", "Libra");
+        postAndUpdate();
+    }
+}));
 // TODO: create an event listener to the document (document.addEventListener) that detects "keyup".
 //  When a certain key of your choice is clicked, reset the values of sun, moon, and rising to your own
 //  values for the sun, moon, and rising using updateValues. Then call postAndUpdate().
@@ -79,8 +77,8 @@ function updateValues(sunval, moonval, risingval) {
         // This line asynchronously waits 1 second before updating the values.
         // It's unnecessary here, but it simulates asynchronous behavior you often have to account for.
         yield new Promise(resolve => setTimeout(resolve, 1000));
-        sun.value = sunval;
-        moon.value = moonval;
-        rising.value = risingval;
+        sunClick.value = sunval;
+        moonClick.value = moonval;
+        risingClick.value = risingval;
     });
 }
